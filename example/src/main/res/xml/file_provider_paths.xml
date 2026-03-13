@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- App-specific external files (no permission needed on API 29+) -->
+    <external-files-path
+        name="external_files"
+        path="." />
+    <!-- App cache on external storage -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+    <!-- Legacy public external storage (API < 29 only) -->
+    <external-path
+        name="external_public"
+        path="Orbbec/OrbbecSdkExample/" />
+</paths>

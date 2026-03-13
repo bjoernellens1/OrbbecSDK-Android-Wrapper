@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Legacy colors (kept for compatibility) -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +8,39 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Material Design 3 color tokens (light) -->
+    <!-- Orbbec brand-inspired blue/teal palette -->
+    <color name="md_primary">#0061A4</color>
+    <color name="md_on_primary">#FFFFFF</color>
+    <color name="md_primary_container">#D1E4FF</color>
+    <color name="md_on_primary_container">#001D36</color>
+    <color name="md_secondary">#006C51</color>
+    <color name="md_on_secondary">#FFFFFF</color>
+    <color name="md_secondary_container">#89F8D3</color>
+    <color name="md_on_secondary_container">#002116</color>
+    <color name="md_tertiary">#6B5778</color>
+    <color name="md_surface">#FDFCFF</color>
+    <color name="md_on_surface">#1A1C1E</color>
+    <color name="md_error">#BA1A1A</color>
+
+    <!-- Material Design 3 color tokens (dark) -->
+    <color name="md_primary_dark">#9ECAFF</color>
+    <color name="md_on_primary_dark">#003258</color>
+    <color name="md_primary_container_dark">#00497D</color>
+    <color name="md_on_primary_container_dark">#D1E4FF</color>
+    <color name="md_secondary_dark">#6CDBB7</color>
+    <color name="md_on_secondary_dark">#00382A</color>
+    <color name="md_secondary_container_dark">#00513D</color>
+    <color name="md_on_secondary_container_dark">#89F8D3</color>
+    <color name="md_tertiary_dark">#D4BBDF</color>
+    <color name="md_surface_dark">#1A1C1E</color>
+    <color name="md_on_surface_dark">#E2E2E6</color>
+
+    <!-- Custom app colors -->
+    <color name="color_recording">#E53935</color>
+    <color name="color_connected">#43A047</color>
+    <color name="color_disconnected">#E53935</color>
+    <color name="color_depth_overlay">#8000BFA5</color>
+    <color name="color_stream_label_bg">#CC000000</color>
 </resources>

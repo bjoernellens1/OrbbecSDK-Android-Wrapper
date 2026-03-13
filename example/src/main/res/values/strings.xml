@@ -1,10 +1,6 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">OrbbecSDKExamples</string>
+    <string name="app_name">Orbbec Data Collector</string>
     <string name="title_activity_sensor_control_welcome">SensorControlWelcomeActivity</string>
-    <!--
-    This string is used for square devices and overridden by hello_world in
-    values-round/strings.xml for round devices.
-    -->
     <string name="hello_world">Hello Square World!</string>
 
     <string name="device_info"><xliff:g>%s</xliff:g>\n
@@ -13,6 +9,57 @@
         PID:<xliff:g>%s</xliff:g>\n
         VID:<xliff:g>%s</xliff:g></string>
 
+    <!-- Home screen -->
+    <string name="home_title">Orbbec Data Collector</string>
+    <string name="home_subtitle">Femto Bolt · Data Acquisition</string>
+    <string name="status_connected">Camera Connected</string>
+    <string name="status_disconnected">No Camera Detected</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="btn_start_collection">Start Collection</string>
+    <string name="btn_view_sessions">Recorded Sessions</string>
+    <string name="btn_examples">Developer Examples</string>
+    <string name="device_label_name">Model: %s</string>
+    <string name="device_label_sn">Serial: %s</string>
+    <string name="device_label_fw">Firmware: %s</string>
+    <string name="sdk_version">SDK %s</string>
+
+    <!-- Data collection screen -->
+    <string name="collection_title">Data Collection</string>
+    <string name="btn_start_record">Start Recording</string>
+    <string name="btn_stop_record">Stop Recording</string>
+    <string name="recording_duration">REC  %s</string>
+    <string name="session_name_hint">Session name (optional)</string>
+    <string name="stream_color">Color</string>
+    <string name="stream_depth">Depth</string>
+    <string name="stream_ir">IR</string>
+    <string name="stream_imu">IMU</string>
+    <string name="imu_accel">Accel  X:%.2f  Y:%.2f  Z:%.2f m/s²</string>
+    <string name="imu_gyro">Gyro   X:%.2f  Y:%.2f  Z:%.2f °/s</string>
+    <string name="recording_saved">Session saved: %s</string>
+    <string name="recording_started">Recording started</string>
+    <string name="recording_failed">Failed to start recording</string>
+    <string name="streams_label">Active streams:</string>
+    <string name="no_streams_selected">Select at least one stream</string>
+
+    <!-- Sessions screen -->
+    <string name="sessions_title">Recorded Sessions</string>
+    <string name="sessions_empty">No sessions recorded yet</string>
+    <string name="session_delete_confirm">Delete this session?</string>
+    <string name="session_delete">Delete</string>
+    <string name="session_share">Share</string>
+    <string name="session_size">%s</string>
+    <string name="session_date">%s</string>
+    <string name="action_delete_all">Delete All</string>
+    <string name="delete_all_confirm">Delete all sessions? This cannot be undone.</string>
+
+    <!-- Permission screen -->
+    <string name="permission_required_title">Permissions Required</string>
+    <string name="permission_camera_rationale">Camera permission is needed to access the depth camera via USB.</string>
+    <string name="permission_storage_rationale">Storage permission is needed to save recorded sessions.</string>
+    <string name="permission_grant">Grant Permissions</string>
+    <string name="permission_denied">Permission denied. Some features may not work.</string>
+
+    <!-- Notifications and misc -->
     <string name="notification">Run Information See Log.</string>
     <string name="depth_mode">Depth work mode</string>
     <string name="sensor">Sensor Type</string>
@@ -20,8 +67,8 @@
     <string name="stop_play">Stop Play</string>
     <string name="device_name">Device name</string>
 
-    <string name="device_not_connected">No device connected !</string>
-    <string name="device_not_support_depth_mode">Current device is not support DepthWorkMode</string>
+    <string name="device_not_connected">No device connected!</string>
+    <string name="device_not_support_depth_mode">Current device does not support DepthWorkMode</string>
     <string name="device_not_support_color">This device does not support Color sensor</string>
     <string name="device_not_support_ir">This device does not support IR sensor</string>
     <string name="device_not_support_ir_left">This device does not support IR Left sensor</string>
@@ -32,7 +79,7 @@
     <string name="device_not_support_align_filter">This device does not support align filter</string>
     <string name="device_not_support_post_process">This device does not support post processing</string>
     <string name="init_stream_profile_failed">Initialize StreamProfile failed</string>
-    <string name="please_access_device">Please access the device</string>
+    <string name="please_access_device">Please connect the device</string>
     <string name="sensor_control_select_device">Select device: </string>
     <string name="sensor_control_select_command">Select command: </string>
     <string name="sensor_control_operate_log">Operate log: </string>
