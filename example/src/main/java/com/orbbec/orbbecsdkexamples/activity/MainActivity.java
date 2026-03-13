@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             needed.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             needed.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             needed.add(Manifest.permission.READ_MEDIA_VIDEO);
             needed.add(Manifest.permission.READ_MEDIA_IMAGES);
         }

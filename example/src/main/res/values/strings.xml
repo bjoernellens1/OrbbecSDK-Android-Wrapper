@@ -18,6 +18,7 @@
     <string name="btn_start_collection">Start Collection</string>
     <string name="btn_view_sessions">Recorded Sessions</string>
     <string name="btn_examples">Developer Examples</string>
+    <string name="btn_back_desc">Go back</string>
     <string name="device_label_name">Model: %s</string>
     <string name="device_label_sn">Serial: %s</string>
     <string name="device_label_fw">Firmware: %s</string>

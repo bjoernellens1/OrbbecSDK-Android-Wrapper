@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
@@ -461,7 +462,9 @@ public class DataCollectionActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             mTvRecordingIndicator.setVisibility(View.VISIBLE);
             mBtnRecord.setText(R.string.btn_stop_record);
-            mBtnRecord.setBackgroundColor(getColor(R.color.color_recording));
+            mBtnRecord.setBackgroundTintList(
+                    android.content.res.ColorStateList.valueOf(
+                            ContextCompat.getColor(this, R.color.color_recording)));
         });
         Toast.makeText(this, R.string.recording_started, Toast.LENGTH_SHORT).show();
     }

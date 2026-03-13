@@ -78,7 +78,7 @@ public class SessionsActivity extends AppCompatActivity implements SessionAdapte
         File[] dirs = root.listFiles(file ->
                 file.isDirectory() && new File(file, "recording.bag").exists());
         if (dirs != null && dirs.length > 0) {
-            Arrays.sort(dirs, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
+            Arrays.sort(dirs, Comparator.comparingLong(File::lastModified).reversed());
             mSessionList.addAll(Arrays.asList(dirs));
         }
         mAdapter.notifyDataSetChanged();
