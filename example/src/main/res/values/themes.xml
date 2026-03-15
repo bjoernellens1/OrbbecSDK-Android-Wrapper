@@ -20,7 +20,7 @@
     </style>
 
     <!-- Legacy theme kept for compatibility with example activities -->
-    <style name="Theme.OrbbecSdkExamples" parent="Theme.Material3.DayNight.DarkActionBar">
+    <style name="Theme.OrbbecSdkExamples" parent="Theme.Material3.DayNight">
         <item name="colorPrimary">@color/md_primary</item>
         <item name="colorOnPrimary">@color/md_on_primary</item>
         <item name="colorSecondary">@color/md_secondary</item>
