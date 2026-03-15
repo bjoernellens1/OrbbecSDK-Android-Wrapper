@@ -35,11 +35,9 @@ jobs:
           cache: gradle
 
       # Accept all SDK licenses non-interactively, then install the exact
-      # SDK platform, build-tools, and NDK version the project declares.
-      # CMake 3.18.1 is installed from the Android SDK repository; the
-      # system cmake (3.22+) acts as a fallback if the exact package is
-      # unavailable.  Both installs are fire-and-forget (|| true) so a
-      # missing optional component does not abort the pipeline.
+      # SDK platform, build-tools, NDK, and CMake version the project declares.
+      # cmake;3.22.1 is the standard stable package in the Android SDK manager.
+      # System cmake is also installed via apt as a belt-and-suspenders fallback.
       - name: Accept Android SDK licenses
         run: |
           yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --licenses || true
@@ -51,11 +49,10 @@ jobs:
             "platforms;android-35" \
             "build-tools;35.0.0" \
             "ndk;21.4.7075529" \
-            "cmake;3.18.1.5063045" || \
-          "${SDKMANAGER}" \
-            "platforms;android-35" \
-            "build-tools;35.0.0" \
-            "ndk;21.4.7075529"
+            "cmake;3.22.1"
+
+      - name: Install system cmake (fallback)
+        run: sudo apt-get install -y cmake
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -105,11 +102,10 @@ jobs:
             "platforms;android-35" \
             "build-tools;35.0.0" \
             "ndk;21.4.7075529" \
-            "cmake;3.18.1.5063045" || \
-          "${SDKMANAGER}" \
-            "platforms;android-35" \
-            "build-tools;35.0.0" \
-            "ndk;21.4.7075529"
+            "cmake;3.22.1"
+
+      - name: Install system cmake (fallback)
+        run: sudo apt-get install -y cmake
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
