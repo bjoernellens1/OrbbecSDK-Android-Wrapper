@@ -517,14 +517,14 @@ public class DataCollectionActivity extends AppCompatActivity {
                 float[] a = accel.getAccelData();
                 mImuCsvWriter.write(String.format(Locale.US,
                         "accel,%d,%.6f,%.6f,%.6f,%.2f\n",
-                        accel.getTimestamp(), a[0], a[1], a[2],
+                        accel.getTimeStamp(), a[0], a[1], a[2],
                         accel.getTemperature()));
             }
             if (gyro != null) {
                 float[] g = gyro.getGyroData();
                 mImuCsvWriter.write(String.format(Locale.US,
                         "gyro,%d,%.6f,%.6f,%.6f,%.2f\n",
-                        gyro.getTimestamp(), g[0], g[1], g[2],
+                        gyro.getTimeStamp(), g[0], g[1], g[2],
                         gyro.getTemperature()));
             }
         } catch (IOException e) {
@@ -570,7 +570,7 @@ public class DataCollectionActivity extends AppCompatActivity {
                 float[] a = accel.getAccelData();
                 mTvAccel.setText(String.format(Locale.US, "Accel  X:%.2f  Y:%.2f  Z:%.2f m/s²",
                         a[0], a[1], a[2]));
-                mTvImuTs.setText(String.format(Locale.US, "ts: %d µs", accel.getTimestamp()));
+                mTvImuTs.setText(String.format(Locale.US, "ts: %d ms", accel.getTimeStamp()));
             } catch (Exception ignore) {
             }
         }
