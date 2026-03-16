@@ -61,8 +61,11 @@ jobs:
               --no-daemon \
               -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
 
-      - name: Build Release APK (Main/Master branches)
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      - name: Build Release APK
+        if: >-
+          github.event_name == 'workflow_dispatch'
+          || (github.event_name == 'push'
+              && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'))
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
@@ -83,7 +86,10 @@ jobs:
           if-no-files-found: error
 
       - name: Upload release APK
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        if: >-
+          github.event_name == 'workflow_dispatch'
+          || (github.event_name == 'push'
+              && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'))
         uses: actions/upload-artifact@v4
         with:
           name: orbbec-data-collector-release
