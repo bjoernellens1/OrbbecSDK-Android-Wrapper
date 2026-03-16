@@ -53,9 +53,9 @@ public class NoiseRemovalFilter extends Filter{
      * @return maxsize值
      * \endif
      */
-    public Uint16PropertyRange getMaxSizeRange() {
+    public IntPropertyRange getMaxSizeRange() {
         throwInitializeException();
-        Uint16PropertyRange maxSizeRange = new Uint16PropertyRange();
+        IntPropertyRange maxSizeRange = new IntPropertyRange();
         nGetMaxSizeRange(mHandle, maxSizeRange.getBytes());
         boolean result = maxSizeRange.parseBytes();
         if (!result) {

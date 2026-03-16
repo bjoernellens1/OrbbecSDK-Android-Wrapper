@@ -480,11 +480,11 @@ Java_com_orbbec_orbbecsdkexamples_utils_ImageUtils_nScalePrecisionToDepthPixel(J
                                                     jobject depthBuffer, jint width, jint height, jint size, jfloat scale) {
     uint8_t* data = (uint8_t*)env->GetDirectBufferAddress(depthBuffer);
     if (nullptr == data || size == 0) {
-        LOGE("nScalePrecisionToDepthPixel failed. data = 0X%08x, depthBuffer size: %d", (long)data, size);
+        LOGE("nScalePrecisionToDepthPixel failed. data = 0X%08lx, depthBuffer size: %d", (long)data, size);
         return;
     }
-    if (width * height * (sizeof(unsigned short)/sizeof(uint8_t)) < size != 0) {
-        LOGE("nScalePrecisionToDepthPixel failed. invalid width and height. width: %d, height: %d, size: %ld", width, height, size);
+    if (width * height * (int)(sizeof(unsigned short)/sizeof(uint8_t)) > size) {
+        LOGE("nScalePrecisionToDepthPixel failed. invalid width and height. width: %d, height: %d, size: %d", width, height, size);
         return;
     }
 

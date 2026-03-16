@@ -3,11 +3,11 @@
     <string name="title_activity_sensor_control_welcome">SensorControlWelcomeActivity</string>
     <string name="hello_world">Hello Square World!</string>
 
-    <string name="device_info"><xliff:g>%s</xliff:g>\n
-        Name:<xliff:g>%s</xliff:g>\n
-        SN:<xliff:g>%s</xliff:g>\n
-        PID:<xliff:g>%s</xliff:g>\n
-        VID:<xliff:g>%s</xliff:g></string>
+    <string name="device_info"><xliff:g>%1$s</xliff:g>\n
+        Name:<xliff:g>%2$s</xliff:g>\n
+        SN:<xliff:g>%3$s</xliff:g>\n
+        PID:<xliff:g>%4$s</xliff:g>\n
+        VID:<xliff:g>%5$s</xliff:g></string>
 
     <!-- Home screen -->
     <string name="home_title">Orbbec Data Collector</string>
@@ -34,8 +34,8 @@
     <string name="stream_depth">Depth</string>
     <string name="stream_ir">IR</string>
     <string name="stream_imu">IMU</string>
-    <string name="imu_accel">Accel  X:%.2f  Y:%.2f  Z:%.2f m/s²</string>
-    <string name="imu_gyro">Gyro   X:%.2f  Y:%.2f  Z:%.2f °/s</string>
+    <string name="imu_accel">Accel  X:%1$.2f  Y:%2$.2f  Z:%3$.2f m/s²</string>
+    <string name="imu_gyro">Gyro   X:%1$.2f  Y:%2$.2f  Z:%3$.2f °/s</string>
     <string name="recording_saved">Session saved: %s</string>
     <string name="recording_started">Recording started</string>
     <string name="recording_failed">Failed to start recording</string>

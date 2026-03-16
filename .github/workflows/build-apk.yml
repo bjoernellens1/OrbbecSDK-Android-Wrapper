@@ -29,14 +29,31 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Cache the Gradle home on the runner so dependencies survive between runs.
+      # The Docker run step mounts this directory into the container.
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle
+          key: gradle-${{ hashFiles('**/*.gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-
+
+      # Build the image with GitHub Actions cache for Docker layers.
+      # This avoids re-downloading the Android SDK (~2 GB) on every push.
       - name: Build Docker image
-        run: |
-          docker build -t orbbec-android-build .
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: orbbec-android-build:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build Debug APK
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
+            -v $HOME/.gradle:/root/.gradle \
             -w /workspace \
             orbbec-android-build \
             ./gradlew :example:assembleDebug \
@@ -49,6 +66,7 @@ jobs:
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
+            -v $HOME/.gradle:/root/.gradle \
             -w /workspace \
             orbbec-android-build \
             ./gradlew :example:assembleRelease \

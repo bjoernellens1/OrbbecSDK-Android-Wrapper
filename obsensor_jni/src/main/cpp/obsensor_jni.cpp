@@ -913,9 +913,9 @@ Java_com_orbbec_obsensor_OBContext_nSetLoggerToFile__ILjava_lang_String_2JJ(
   ob_error *error = NULL;
   std::string strFilePath(getStdString(
       env, directory, "nSetLoggerToFile__ILjava_lang_String_2JJ", "directory"));
-  LOGI("SetLoggerToFile with file size. directory: %s, maxFileSize: %lld, "
-       "maxFileNum: %lld",
-       strFilePath.c_str(), maxFileSize, maxFileNum);
+  LOGI("SetLoggerToFile with file size. directory: %s, maxFileSize: %" PRId64 ", "
+       "maxFileNum: %" PRId64,
+       strFilePath.c_str(), (int64_t)maxFileSize, (int64_t)maxFileNum);
   ob_set_logger_to_rotating_file(static_cast<ob_log_severity>(logSeverity),
                                  strFilePath.c_str(), (uint32_t)maxFileSize,
                                  (uint32_t)maxFileNum, &error);
@@ -2512,7 +2512,7 @@ Java_com_orbbec_obsensor_Frame_nGetTimeStampUs(JNIEnv *env, jclass instance,
   ob_handle_error(env, error);
 
   char buf[64] = {0};
-  std::snprintf(buf, sizeof(buf), "%llu", timeStampUs);
+  std::snprintf(buf, sizeof(buf), "%" PRIu64, timeStampUs);
   return env->NewStringUTF(buf);
 }
 
@@ -3829,13 +3829,13 @@ Java_com_orbbec_obsensor_NoiseRemovalFilter_nGetMaxSizeRange(JNIEnv *env, jclass
                                                              jbyteArray maxSizeRange) {
   ob_error *error = NULL;
   ob_filter *filter = reinterpret_cast<ob_filter *>(handle);
-  ob_uint16_property_range range = ob_noise_removal_filter_get_max_size_range(filter, &error);
+  ob_int_property_range range = ob_noise_removal_filter_get_max_size_range(filter, &error);
   ob_handle_error(env, error);
 
   jbyte *maxSizeRange_ = env->GetByteArrayElements(maxSizeRange, JNI_FALSE);
 
-  memmove(maxSizeRange_, &range, sizeof(ob_uint16_property_range));
-  env->SetByteArrayRegion(maxSizeRange, 0, sizeof(ob_uint16_property_range),
+  memmove(maxSizeRange_, &range, sizeof(ob_int_property_range));
+  env->SetByteArrayRegion(maxSizeRange, 0, sizeof(ob_int_property_range),
                           maxSizeRange_);
 
   env->ReleaseByteArrayElements(maxSizeRange, maxSizeRange_, 0);
