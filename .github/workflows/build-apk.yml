@@ -17,54 +17,44 @@ permissions:
   contents: read
 
 jobs:
-  # ── Debug APK ────────────────────────────────────────────────────────────────
-  build-debug:
-    name: Build Debug APK
+  # ── Build with Docker ────────────────────────────────────────────────────────
+  build:
+    name: Build orbbec-android-wrapper
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Java 17 is required by AGP 8.x
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      # Accept all SDK licenses non-interactively, then install the exact
-      # SDK platform, build-tools, NDK, and CMake version the project declares.
-      # cmake;3.22.1 is the standard stable package in the Android SDK manager.
-      # System cmake is also installed via apt as a belt-and-suspenders fallback.
-      - name: Accept Android SDK licenses
+      - name: Build Docker image
         run: |
-          yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+          docker build -t orbbec-android-build .
 
-      - name: Install required Android SDK components
+      - name: Build Debug APK
         run: |
-          SDKMANAGER="${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager"
-          "${SDKMANAGER}" \
-            "platforms;android-35" \
-            "build-tools;35.0.0" \
-            "ndk;21.4.7075529" \
-            "cmake;3.22.1"
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            orbbec-android-build \
+            ./gradlew :example:assembleDebug \
+              --stacktrace \
+              --no-daemon \
+              -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
 
-      - name: Install system cmake (fallback)
-        run: sudo apt-get install -y cmake
-
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Build debug APK
+      - name: Build Release APK (Main/Master branches)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         run: |
-          ./gradlew :example:assembleDebug \
-            --stacktrace \
-            --no-daemon \
-            -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
-        env:
-          ANDROID_NDK_HOME: ${{ env.ANDROID_SDK_ROOT }}/ndk/21.4.7075529
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            orbbec-android-build \
+            ./gradlew :example:assembleRelease \
+              --stacktrace \
+              --no-daemon \
+              -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -74,52 +64,8 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-  # ── Release APK (main / master pushes only) ───────────────────────────────
-  build-release:
-    name: Build Release APK
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Accept Android SDK licenses
-        run: |
-          yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --licenses || true
-
-      - name: Install required Android SDK components
-        run: |
-          SDKMANAGER="${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager"
-          "${SDKMANAGER}" \
-            "platforms;android-35" \
-            "build-tools;35.0.0" \
-            "ndk;21.4.7075529" \
-            "cmake;3.22.1"
-
-      - name: Install system cmake (fallback)
-        run: sudo apt-get install -y cmake
-
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Build release APK
-        run: |
-          ./gradlew :example:assembleRelease \
-            --stacktrace \
-            --no-daemon \
-            -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
-        env:
-          ANDROID_NDK_HOME: ${{ env.ANDROID_SDK_ROOT }}/ndk/21.4.7075529
-
       - name: Upload release APK
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         uses: actions/upload-artifact@v4
         with:
           name: orbbec-data-collector-release
