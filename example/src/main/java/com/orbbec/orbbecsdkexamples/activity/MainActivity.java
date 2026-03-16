@@ -179,16 +179,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // SDK is init once in onCreate after permissions; re-init if released
+        // Re-init SDK only if it was destroyed (e.g. after onDestroy/recreate).
+        // We intentionally do NOT release SDK in onStop because the USB permission
+        // dialog pauses/stops this activity and destroying OBContext would lose the
+        // pending permission result and device callbacks.
         if (mOBContext == null) {
             initSDK();
         }
     }
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         releaseSDK();
-        super.onStop();
+        super.onDestroy();
     }
 
     private void initSDK() {

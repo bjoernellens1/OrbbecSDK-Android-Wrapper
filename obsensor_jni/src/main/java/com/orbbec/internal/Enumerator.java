@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -112,7 +113,11 @@ public class Enumerator {
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
-        context.registerReceiver(mBroadcastReceiver, intentFilter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(mBroadcastReceiver, intentFilter, Context.RECEIVER_EXPORTED);
+        } else {
+            context.registerReceiver(mBroadcastReceiver, intentFilter);
+        }
 
         mMessagesThread = new HandlerThread("DeviceManager device availability message thread");
         mMessagesThread.start();
@@ -172,7 +177,11 @@ public class Enumerator {
 
         IntentFilter intentFilter = new IntentFilter(action);
         final USBPermissionReceiver receiver = new USBPermissionReceiver(context, usbDevice, action);
-        context.registerReceiver(receiver, intentFilter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(receiver, intentFilter, Context.RECEIVER_EXPORTED);
+        } else {
+            context.registerReceiver(receiver, intentFilter);
+        }
 
         if (null != mHandler) {
             Message msg = Message.obtain(mHandler, () -> {

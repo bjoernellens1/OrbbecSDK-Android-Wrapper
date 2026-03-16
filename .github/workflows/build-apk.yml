@@ -15,6 +15,10 @@ on:
 # ── Security: minimal token scope ─────────────────────────────────────────────
 permissions:
   contents: read
+  packages: write          # push/pull Docker image to GHCR
+
+env:
+  DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/orbbec-android-build
 
 jobs:
   # ── Build with Docker ────────────────────────────────────────────────────────
@@ -29,6 +33,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       # Cache the Gradle home on the runner so dependencies survive between runs.
       # The Docker run step mounts this directory into the container.
       - name: Cache Gradle
@@ -38,16 +49,32 @@ jobs:
           key: gradle-${{ hashFiles('**/*.gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: gradle-
 
-      # Build the image with GitHub Actions cache for Docker layers.
-      # This avoids re-downloading the Android SDK (~2 GB) on every push.
+      # Build the image, pulling cached layers from GHCR.
+      # On main/master pushes the image is also pushed to GHCR so
+      # subsequent runs (including on feature branches) reuse it.
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           load: true
-          tags: orbbec-android-build:latest
-          cache-from: type=gha
+          push: false
+          tags: |
+            orbbec-android-build:latest
+            ${{ env.DOCKER_IMAGE }}:latest
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          cache-from: |
+            type=registry,ref=${{ env.DOCKER_IMAGE }}:latest
+            type=gha
           cache-to: type=gha,mode=max
+
+      # Push image to GHCR on main/master so future runs can pull cached layers
+      - name: Push Docker image to GHCR
+        if: >-
+          github.event_name == 'push'
+          && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: |
+          docker push "${{ env.DOCKER_IMAGE }}:latest"
+          docker push "${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
 
       - name: Build Debug APK
         run: |
