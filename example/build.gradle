@@ -9,13 +9,12 @@ obSignatureProp.load(project.file('../keystore/signature.properties').newDataInp
 
 android {
     namespace 'com.orbbec.orbbecsdkexamples'
-    compileSdk 33
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.orbbec.orbbecsdkexamples"
-        minSdk 24
-        //noinspection ExpiredTargetSdkVersion
-        targetSdk 27
+        minSdk 26
+        targetSdk 35
         def format = new SimpleDateFormat("yyyyMMdd")
         def dataFormat = format.format(new Date())
         dataFormat+="01"//01是当天得第几版。默认是第一版
@@ -78,13 +77,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version '3.18.1'
+            version '3.22.1'
         }
     }
     ndkVersion '21.4.7075529'
@@ -92,13 +91,15 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.cardview:cardview:1.0.0'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-	implementation 'com.google.code.gson:gson:2.10.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation project(':obsensor_jni')
 }

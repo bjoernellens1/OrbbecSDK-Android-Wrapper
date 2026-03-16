@@ -119,6 +119,10 @@ public class FileUtils {
     }
 
     public synchronized static String getExternalSaveDir() {
+        // On Android 10+ (API 29+) use app-specific external storage (no permission needed)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            return getPackageExternalSaveDir();
+        }
         if (ActivityCompat.checkSelfPermission(MyApplication.getInstance(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             return getPackageExternalSaveDir();
         }

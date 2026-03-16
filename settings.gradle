@@ -1,27 +1,29 @@
 pluginManagement {
     repositories {
-        // If you location China, Keep enable aliyun maven source
+        // Canonical repos first – avoids slow round-trips to Aliyun mirrors
+        // from CI runners outside China.
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        // Aliyun mirrors – faster fallback for builds in China
         maven { url 'https://maven.aliyun.com/repository/public/' }
         maven { url 'https://maven.aliyun.com/repository/google/' }
 //        maven { url 'https://maven.aliyun.com/repository/jcenter/' } // Office jcenter stop service not need to use agent
         maven { url 'https://maven.aliyun.com/repository/central/' }
-
-        google()
-        mavenCentral()
-        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        // If you location China, Keep enable aliyun maven source
+        // Canonical repos first – avoids slow round-trips to Aliyun mirrors
+        // from CI runners outside China.
+        google()
+        mavenCentral()
+        // Aliyun mirrors – faster fallback for builds in China
         maven { url 'https://maven.aliyun.com/repository/public/' }
         maven { url 'https://maven.aliyun.com/repository/google/' }
 //        maven { url 'https://maven.aliyun.com/repository/jcenter/' } // Office jcenter stop service not need to use agent
         maven { url 'https://maven.aliyun.com/repository/central/' }
-
-        google()
-        mavenCentral()
     }
 }
 

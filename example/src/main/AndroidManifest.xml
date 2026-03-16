@@ -1,48 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.orbbec.orbbecsdkexamples">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- USB host access for Orbbec camera -->
     <uses-feature android:name="android.hardware.usb.host" />
+
+    <!-- Camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Storage: legacy for API < 29, scoped storage for API 29+ -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <!-- Media permissions for Android 13+ (API 33+) -->
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_VIDEO"
+        android:minSdkVersion="33" />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
+        android:minSdkVersion="33" />
+
+    <!-- Foreground service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <!-- Network (optional, for future use) -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".application.MyApplication"
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.OrbbecSdkExamples">
-        <activity android:name=".activity.RecordPlaybackActivity" />
-        <activity android:name=".activity.HotPluginActivity" />
-        <activity android:name=".activity.SaveToDiskActivity" />
-        <activity android:name=".activity.SensorControlActivity" />
-        <activity android:name=".activity.SyncAlignViewerActivity" />
-        <activity android:name=".activity.PointCloudActivity" />
-        <activity android:name=".activity.HelloOrbbecActivity" />
-        <activity android:name=".activity.DepthViewerActivity" />
-        <activity android:name=".activity.InfraredViewerActivity" />
-        <activity android:name=".activity.DoubleIRViewerActivity" />
-        <activity android:name=".activity.ColorViewerActivity" />
-        <activity android:name=".activity.ImuActivity" />
-        <activity android:name=".activity.DepthModeActivity" />
-        <activity android:name=".activity.MultiDeviceActivity" />
-        <activity android:name=".activity.AlignFilterViewerActivity" />
-        <activity android:name=".activity.HdrMergeActivity" />
-        <activity android:name=".activity.PostProcessingActivity" />
-        <activity android:name=".activity.MultiStreamActivity" />
-        <activity android:name=".activity.FirmwareUpgradeActivity" />
-        <activity android:name=".activity.MainActivity">
+        android:theme="@style/Theme.DataCollector">
+
+        <!-- Data Collection Activities (primary) -->
+        <activity
+            android:name=".activity.MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.DataCollectionActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".activity.SessionsActivity"
+            android:exported="false" />
+
+        <!-- Legacy Example Activities -->
+        <activity android:name=".activity.RecordPlaybackActivity" android:exported="false" />
+        <activity android:name=".activity.HotPluginActivity" android:exported="false" />
+        <activity android:name=".activity.SaveToDiskActivity" android:exported="false" />
+        <activity android:name=".activity.SensorControlActivity" android:exported="false" />
+        <activity android:name=".activity.SyncAlignViewerActivity" android:exported="false" />
+        <activity android:name=".activity.PointCloudActivity" android:exported="false" />
+        <activity android:name=".activity.HelloOrbbecActivity" android:exported="false" />
+        <activity android:name=".activity.DepthViewerActivity" android:exported="false" />
+        <activity android:name=".activity.InfraredViewerActivity" android:exported="false" />
+        <activity android:name=".activity.DoubleIRViewerActivity" android:exported="false" />
+        <activity android:name=".activity.ColorViewerActivity" android:exported="false" />
+        <activity android:name=".activity.ImuActivity" android:exported="false" />
+        <activity android:name=".activity.DepthModeActivity" android:exported="false" />
+        <activity android:name=".activity.MultiDeviceActivity" android:exported="false" />
+        <activity android:name=".activity.AlignFilterViewerActivity" android:exported="false" />
+        <activity android:name=".activity.HdrMergeActivity" android:exported="false" />
+        <activity android:name=".activity.PostProcessingActivity" android:exported="false" />
+        <activity android:name=".activity.MultiStreamActivity" android:exported="false" />
+        <activity android:name=".activity.FirmwareUpgradeActivity" android:exported="false" />
+        <!-- FileProvider for sharing recorded session files -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
+
     </application>
 
 </manifest>

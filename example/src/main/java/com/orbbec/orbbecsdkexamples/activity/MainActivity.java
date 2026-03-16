@@ -3,148 +3,238 @@ package com.orbbec.orbbecsdkexamples.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.orbbec.obsensor.DeviceChangedCallback;
+import com.orbbec.obsensor.Device;
+import com.orbbec.obsensor.DeviceInfo;
+import com.orbbec.obsensor.DeviceList;
+import com.orbbec.obsensor.LogSeverity;
+import com.orbbec.obsensor.OBContext;
+import com.orbbec.obsensor.OBException;
 import com.orbbec.orbbecsdkexamples.R;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
 
     static {
         System.loadLibrary("orbbecsdkexamples");
     }
 
+    private OBContext mOBContext;
+    private volatile boolean mDeviceConnected = false;
+    private String mDeviceName = "";
+    private String mDeviceSn = "";
+    private String mDeviceFw = "";
+
+    // Views
+    private TextView mTvConnectionStatus;
+    private LinearLayout mLayoutDeviceInfo;
+    private TextView mTvDeviceName;
+    private TextView mTvDeviceSn;
+    private TextView mTvDeviceFw;
+    private TextView mTvSdkVersion;
+    private MaterialButton mBtnStartCollection;
+
+    private final ActivityResultLauncher<String[]> mPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean allGranted = true;
+                for (Boolean granted : result.values()) {
+                    if (!granted) {
+                        allGranted = false;
+                        break;
+                    }
+                }
+                if (!allGranted) {
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_LONG).show();
+                }
+                initSDK();
+            });
+
+    private final DeviceChangedCallback mDeviceChangedCallback = new DeviceChangedCallback() {
+        @Override
+        public void onDeviceAttach(DeviceList deviceList) {
+            try {
+                if (deviceList != null && deviceList.getDeviceCount() > 0) {
+                    try (Device device = deviceList.getDevice(0)) {
+                        DeviceInfo info = device.getInfo();
+                        mDeviceName = info.getName() != null ? info.getName() : "Unknown";
+                        mDeviceSn = info.getSerialNumber() != null ? info.getSerialNumber() : "--";
+                        mDeviceFw = info.getFirmwareVersion() != null ? info.getFirmwareVersion() : "--";
+                        info.close();
+                    }
+                    mDeviceConnected = true;
+                    runOnUiThread(MainActivity.this::updateDeviceUI);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (deviceList != null) deviceList.close();
+                } catch (Exception ignore) {
+                }
+            }
+        }
+
+        @Override
+        public void onDeviceDetach(DeviceList deviceList) {
+            mDeviceConnected = false;
+            mDeviceName = "";
+            mDeviceSn = "";
+            mDeviceFw = "";
+            runOnUiThread(MainActivity.this::updateDeviceUI);
+            try {
+                if (deviceList != null) deviceList.close();
+            } catch (Exception ignore) {
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        requestPermission();
-        initView();
+        initViews();
+        requestPermissionsIfNeeded();
     }
 
-    private void requestPermission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+    private void initViews() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                    999);
+        mTvConnectionStatus = findViewById(R.id.tv_connection_status);
+        mLayoutDeviceInfo = findViewById(R.id.layout_device_info);
+        mTvDeviceName = findViewById(R.id.tv_device_name);
+        mTvDeviceSn = findViewById(R.id.tv_device_sn);
+        mTvDeviceFw = findViewById(R.id.tv_device_fw);
+        mTvSdkVersion = findViewById(R.id.tv_sdk_version);
+
+        mBtnStartCollection = findViewById(R.id.btn_start_collection);
+        mBtnStartCollection.setOnClickListener(v -> startActivity(
+                new Intent(this, DataCollectionActivity.class)));
+
+        MaterialButton btnSessions = findViewById(R.id.btn_sessions);
+        btnSessions.setOnClickListener(v -> startActivity(
+                new Intent(this, SessionsActivity.class)));
+
+        // Developer example buttons
+        bindExampleButton(R.id.btn_example_color, ColorViewerActivity.class);
+        bindExampleButton(R.id.btn_example_depth, DepthViewerActivity.class);
+        bindExampleButton(R.id.btn_example_imu, ImuActivity.class);
+        bindExampleButton(R.id.btn_example_pointcloud, PointCloudActivity.class);
+        bindExampleButton(R.id.btn_example_sync, SyncAlignViewerActivity.class);
+        bindExampleButton(R.id.btn_example_record, RecordPlaybackActivity.class);
+        bindExampleButton(R.id.btn_example_sensor_control, SensorControlActivity.class);
+        bindExampleButton(R.id.btn_example_firmware, FirmwareUpgradeActivity.class);
+
+        updateDeviceUI();
+    }
+
+    private void bindExampleButton(int btnId, Class<?> activityClass) {
+        View btn = findViewById(btnId);
+        if (btn != null) {
+            btn.setOnClickListener(v -> startActivity(new Intent(this, activityClass)));
         }
     }
 
-    private void initView() {
-        Button colorView = findViewById(R.id.btn_colorview);
-        colorView.setOnClickListener(this);
-
-        Button irView = findViewById(R.id.btn_irview);
-        irView.setOnClickListener(this);
-
-        Button doubleIRView = findViewById(R.id.btn_double_irview);
-        doubleIRView.setOnClickListener(this);
-
-        Button depthView = findViewById(R.id.btn_depthview);
-        depthView.setOnClickListener(this);
-
-        Button recordPlayback = findViewById(R.id.btn_record_playback);
-        recordPlayback.setOnClickListener(this);
-
-        Button helloOrbbec = findViewById(R.id.btn_hello_orbbec);
-        helloOrbbec.setOnClickListener(this);
-
-        Button pointClound = findViewById(R.id.btn_pointcloud);
-        pointClound.setOnClickListener(this);
-
-        Button syncAlignView = findViewById(R.id.btn_sync_align_view);
-        syncAlignView.setOnClickListener(this);
-
-        Button sensorControl = findViewById(R.id.btn_sensor_control);
-        sensorControl.setOnClickListener(this);
-
-        Button multiDevice = findViewById(R.id.btn_multi_device);
-        multiDevice.setOnClickListener(this);
-
-        Button imu = findViewById(R.id.btn_imu);
-        imu.setOnClickListener(this);
-
-        Button depthMode = findViewById(R.id.btn_depth_work_mode);
-        depthMode.setOnClickListener(this);
-
-        Button saveToDisk = findViewById(R.id.btn_savetodisk);
-        saveToDisk.setOnClickListener(this);
-
-        Button hotPlugin = findViewById(R.id.btn_hot_plugin);
-        hotPlugin.setOnClickListener(this);
-
-        Button hdrMerge = findViewById(R.id.btn_hdr_merge);
-        hdrMerge.setOnClickListener(this);
-
-        Button alignFilter = findViewById(R.id.btn_align_filter_view);
-        alignFilter.setOnClickListener(this);
-
-        Button postProcessing = findViewById(R.id.btn_post_processing);
-        postProcessing.setOnClickListener(this);
-
-        Button multiStream = findViewById(R.id.btn_multi_stream);
-        multiStream.setOnClickListener(this);
-
-        Button firmwareUpgrade = findViewById(R.id.btn_firmware_upgrade);
-        firmwareUpgrade.setOnClickListener(this);
+    private void requestPermissionsIfNeeded() {
+        List<String> needed = new ArrayList<>();
+        needed.add(Manifest.permission.CAMERA);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            needed.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            needed.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            needed.add(Manifest.permission.READ_MEDIA_VIDEO);
+            needed.add(Manifest.permission.READ_MEDIA_IMAGES);
+        }
+        List<String> toRequest = new ArrayList<>();
+        for (String perm : needed) {
+            if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
+                toRequest.add(perm);
+            }
+        }
+        if (toRequest.isEmpty()) {
+            initSDK();
+        } else {
+            mPermissionLauncher.launch(toRequest.toArray(new String[0]));
+        }
     }
 
     @Override
-    public void onClick(View v) {
-        int id = v.getId();
-        if (id == R.id.btn_colorview) {
-            toActivity(ColorViewerActivity.class);
-        } else if (id == R.id.btn_irview) {
-            toActivity(InfraredViewerActivity.class);
-        } else if (id == R.id.btn_double_irview) {
-            toActivity(DoubleIRViewerActivity.class);
-        } else if (id == R.id.btn_depthview) {
-            toActivity(DepthViewerActivity.class);
-        } else if (id == R.id.btn_record_playback) {
-            toActivity(RecordPlaybackActivity.class);
-        } else if (id == R.id.btn_hello_orbbec) {
-            toActivity(HelloOrbbecActivity.class);
-        } else if (id == R.id.btn_pointcloud) {
-            toActivity(PointCloudActivity.class);
-        } else if (id == R.id.btn_sync_align_view) {
-            toActivity(SyncAlignViewerActivity.class);
-        } else if (id == R.id.btn_sensor_control) {
-            toActivity(SensorControlActivity.class);
-        } else if (id == R.id.btn_multi_device) {
-            toActivity(MultiDeviceActivity.class);
-        } else if (id == R.id.btn_imu) {
-            toActivity(ImuActivity.class);
-        } else if (id == R.id.btn_depth_work_mode) {
-            toActivity(DepthModeActivity.class);
-        } else if (id == R.id.btn_savetodisk) {
-            toActivity(SaveToDiskActivity.class);
-        } else if (id == R.id.btn_hot_plugin) {
-            toActivity(HotPluginActivity.class);
-        } else if (id == R.id.btn_hdr_merge) {
-            toActivity(HdrMergeActivity.class);
-        } else if (id == R.id.btn_align_filter_view) {
-            toActivity(AlignFilterViewerActivity.class);
-        } else if (id == R.id.btn_post_processing) {
-            toActivity(PostProcessingActivity.class);
-        } else if (id == R.id.btn_multi_stream) {
-            toActivity(MultiStreamActivity.class);
-        } else if (id == R.id.btn_firmware_upgrade) {
-            toActivity(FirmwareUpgradeActivity.class);
+    protected void onStart() {
+        super.onStart();
+        // SDK is init once in onCreate after permissions; re-init if released
+        if (mOBContext == null) {
+            initSDK();
         }
     }
 
-    private void toActivity(Class activityClass) {
-        startActivity(new Intent(this, activityClass));
+    @Override
+    protected void onStop() {
+        releaseSDK();
+        super.onStop();
     }
+
+    private void initSDK() {
+        if (mOBContext != null) return;
+        try {
+            if (com.orbbec.orbbecsdkexamples.BuildConfig.DEBUG) {
+                OBContext.setLoggerSeverity(LogSeverity.WARN);
+            }
+            mOBContext = new OBContext(getApplicationContext(), mDeviceChangedCallback);
+            String sdkVersion = OBContext.getVersionName();
+            runOnUiThread(() -> {
+                if (mTvSdkVersion != null) {
+                    mTvSdkVersion.setText(getString(R.string.sdk_version, sdkVersion));
+                }
+            });
+        } catch (OBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void releaseSDK() {
+        try {
+            if (mOBContext != null) {
+                mOBContext.close();
+                mOBContext = null;
+            }
+        } catch (OBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateDeviceUI() {
+        if (mDeviceConnected) {
+            mTvConnectionStatus.setText(R.string.status_connected);
+            mTvConnectionStatus.setTextColor(ContextCompat.getColor(this, R.color.color_connected));
+            mLayoutDeviceInfo.setVisibility(View.VISIBLE);
+            mTvDeviceName.setText(getString(R.string.device_label_name, mDeviceName));
+            mTvDeviceSn.setText(getString(R.string.device_label_sn, mDeviceSn));
+            mTvDeviceFw.setText(getString(R.string.device_label_fw, mDeviceFw));
+            mBtnStartCollection.setEnabled(true);
+        } else {
+            mTvConnectionStatus.setText(R.string.status_disconnected);
+            mTvConnectionStatus.setTextColor(ContextCompat.getColor(this, R.color.color_disconnected));
+            mLayoutDeviceInfo.setVisibility(View.GONE);
+            mBtnStartCollection.setEnabled(false);
+        }
+    }
+
 }

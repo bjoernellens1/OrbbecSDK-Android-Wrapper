@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".activity.DataCollectionActivity">
+
+    <!-- ====== Stream preview grid (landscape): 2×2 ====== -->
+
+    <!-- Color stream (top-left) -->
+    <FrameLayout
+        android:id="@+id/fl_color"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fl_depth"
+        app:layout_constraintBottom_toTopOf="@id/fl_ir"
+        android:background="#0D111827">
+
+        <com.orbbec.orbbecsdkexamples.view.OBGLView
+            android:id="@+id/glv_color"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/tv_label_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="8dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="@string/stream_color"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:background="@color/color_stream_label_bg" />
+
+    </FrameLayout>
+
+    <!-- Depth stream (top-right) -->
+    <FrameLayout
+        android:id="@+id/fl_depth"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/fl_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/fl_imu"
+        android:background="#0D112718">
+
+        <com.orbbec.orbbecsdkexamples.view.OBGLView
+            android:id="@+id/glv_depth"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/tv_label_depth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="8dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="@string/stream_depth"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:background="@color/color_stream_label_bg" />
+
+    </FrameLayout>
+
+    <!-- IR stream (bottom-left) -->
+    <FrameLayout
+        android:id="@+id/fl_ir"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/fl_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fl_imu"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="#0D271118">
+
+        <com.orbbec.orbbecsdkexamples.view.OBGLView
+            android:id="@+id/glv_ir"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/tv_label_ir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="8dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="@string/stream_ir"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:background="@color/color_stream_label_bg" />
+
+    </FrameLayout>
+
+    <!-- IMU data panel (bottom-right) -->
+    <FrameLayout
+        android:id="@+id/fl_imu"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/fl_depth"
+        app:layout_constraintStart_toEndOf="@id/fl_ir"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="#0D181127">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tv_label_imu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="@string/stream_imu"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:background="@color/color_stream_label_bg" />
+
+            <TextView
+                android:id="@+id/tv_accel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:fontFamily="monospace"
+                android:text="Accel  --"
+                android:textColor="#CCFFFFFF"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_gyro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:fontFamily="monospace"
+                android:text="Gyro   --"
+                android:textColor="#CCFFFFFF"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_imu_ts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="ts: --"
+                android:textColor="#88FFFFFF"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- ====== Overlay controls (top bar) ====== -->
+    <LinearLayout
+        android:id="@+id/layout_top_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:background="#CC000000"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_media_rew"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/btn_back_desc"
+            android:tint="#FFFFFF"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/collection_title"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Recording indicator -->
+        <TextView
+            android:id="@+id/tv_recording_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="● REC 00:00"
+            android:textColor="@color/color_recording"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Session name input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_session_name"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/session_name_hint"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+            android:layout_marginEnd="8dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_session_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:inputType="text"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Record button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_start_record"
+            android:textSize="13sp"
+            style="@style/Widget.Material3.Button" />
+
+    </LinearLayout>
+
+    <!-- ====== Stream selection chips (bottom bar) ====== -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_streams"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:background="#CC000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:singleSelection="false">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Color"
+            android:checked="true"
+            style="@style/Widget.Material3.Chip.Filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_depth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Depth"
+            android:checked="true"
+            style="@style/Widget.Material3.Chip.Filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_ir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="IR"
+            android:checked="true"
+            style="@style/Widget.Material3.Chip.Filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_imu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="IMU"
+            android:checked="true"
+            style="@style/Widget.Material3.Chip.Filter" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

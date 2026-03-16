@@ -1,0 +1,74 @@
+name: Build APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - 'copilot/**'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+# ── Security: minimal token scope ─────────────────────────────────────────────
+permissions:
+  contents: read
+
+jobs:
+  # ── Build with Docker ────────────────────────────────────────────────────────
+  build:
+    name: Build orbbec-android-wrapper
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t orbbec-android-build .
+
+      - name: Build Debug APK
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            orbbec-android-build \
+            ./gradlew :example:assembleDebug \
+              --stacktrace \
+              --no-daemon \
+              -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
+
+      - name: Build Release APK (Main/Master branches)
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            orbbec-android-build \
+            ./gradlew :example:assembleRelease \
+              --stacktrace \
+              --no-daemon \
+              -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m"
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbbec-data-collector-debug
+          path: example/build/outputs/apk/debug/*.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Upload release APK
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbbec-data-collector-release
+          path: example/build/outputs/apk/release/*.apk
+          retention-days: 90
+          if-no-files-found: error
